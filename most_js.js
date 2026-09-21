@@ -1273,6 +1273,18 @@
         oszczedzanie baterii oraz niedobijanie brokera - tam zostaja stare odstepy.
         ⚠ Brokera i tak nie dobijemy: `polaczTeraz` pilnuje 1,5 s miedzy probami niezaleznie od tego. */
     const ODSTEPY_PATRZY = [1, 2, 3, 5];
+    /*  ⛔ ODMOWA KONTA TO NIE ZERWANE LACZE [21.09.2026, objaw z Gliczarowa].
+        ------------------------------------------------------------
+        OBJAW: „przeladowuje sie co sekunde, pokazuje OK, rozlacza sie i tak w kolko" - przy czym
+        dwa pozostale serwery dzialaly. Dziennik apki: „serwery: 1:ok 2:zerwane 3:ok".
+        PRZYCZYNA: po odmowie KONTA apka ponawiala z `ODSTEPY_PATRZY`, czyli co 5 s bez konca.
+        ⚠ Tamta tabela powstala dla zerwanego lacza i tam jest sluszna - lacze wraca samo, wiec
+          warto probowac czesto. **Konto, ktorego broker nie zna, nie pojawi sie od probowania.**
+          Moze je stworzyc tylko czlowiek, a do tego potrzebuje spokojnego ekranu i komunikatu,
+          nie migotania co piec sekund.
+        ⚠ Znacznik `odmowaKonta` zdejmuje sie przy pierwszym udanym polaczeniu [D-422], wiec po
+          poprawieniu konta apka wraca do normalnego rytmu sama - bez restartu. */
+    const ODSTEPY_KONTO = [5, 15, 30, 60, 120, 300];
     /*  [D-427a] JEDNA NAZWA DROGI dla dziennika i dla ekranu. `slot` to numer slotu STEROWNIKA
         (z tematu `serwery`), a gdy go jeszcze nie znamy - pozycja na naszej liscie polaczen.
         Trzeci adres nie jest „slotem 3": to drugi kandydat do slotu 2. */
@@ -1337,7 +1349,9 @@
       const ponowPozniej = powod => {
         /* [D-345] tablica zalezy od tego, czy ktos patrzy - patrz uzasadnienie przy ODSTEPY_PATRZY */
         const widac = (typeof document === 'undefined') || document.visibilityState !== 'hidden';
-        const tab = widac ? ODSTEPY_PATRZY : ODSTEPY;
+        /*  Kolejnosc ma znaczenie: odmowa konta bije nawet wtedy, gdy czlowiek patrzy -
+            bo patrzenie nie zmienia faktu, ze tego konta broker nie zna. */
+        const tab = c.odmowaKonta ? ODSTEPY_KONTO : (widac ? ODSTEPY_PATRZY : ODSTEPY);
         const sek = tab[Math.min(c.odstepNr, tab.length - 1)]; c.odstepNr++;
         if (c.ponowZegar) clearTimeout(c.ponowZegar);
         c.ponowZegar = setTimeout(() => { c.ponowZegar = null; c.polaczTeraz(powod); }, sek * 1000);
