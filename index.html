@@ -116,8 +116,13 @@
   /*  [D-326] NAZWA PRZESTAJE NADPISYWAC RECZNIE WPISANEGO UZYTKOWNIKA. Konto serwisowe nazywa sie
       z wielkiej litery, a `slug()` robi z tego male litery - broker odpowiada wtedy „brak
       uprawnien" (sprawdzone na obu: HiveMQ i EMQX). Kto raz poprawi pole, ten wie, co robi. */
-  let userRecznie = false;
-  el('user').addEventListener('input', () => { userRecznie = (el('user').value.trim() !== ''); });
+  let userRecznie = false, serwRecznie = false;
+  /*  [D-484, B.0z-38] PTASZEK NIE PRZEŻYWA ZMIANY KONTA. Zapamiętany „serwisowe" zostawał po przejściu
+      z konta serwisowego na klienckie - apka zapisywała się zakresem, którego nowe konto nie ma, i sypała
+      odmowami. Dopóki człowiek sam nie dotknie ptaszka, idzie on za kształtem loginu (myślnik = klient). */
+  el('serw').addEventListener('change', () => { serwRecznie = true; });
+  el('user').addEventListener('input', () => { userRecznie = (el('user').value.trim() !== '');
+    if (!serwRecznie) el('serw').checked = (!!el('user').value.trim() && el('user').value.trim().indexOf('-') < 0); });
   el('nazwa').addEventListener('input', () => { if (!userRecznie) el('user').value = slug(el('nazwa').value); });
 
   if ('serviceWorker' in navigator) {
