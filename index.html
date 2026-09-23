@@ -92,8 +92,8 @@
   const el = id => document.getElementById(id);
   const q = new URLSearchParams(location.search);
   const HOST = 'aquareact.duckdns.org:8887', HOST2 = '';
-  let z = null; try { z = JSON.parse(localStorage.getItem('odbior_mqtt') || 'null'); } catch(e){}
-  try { localStorage.setItem('pwa', '1'); } catch(e){}
+  let z = null; try { z = JSON.parse(localStorage.getItem('test2:odbior_mqtt') || 'null'); } catch(e){}
+  try { localStorage.setItem('test2:pwa', '1'); } catch(e){}
   /* zapamiętane dane i nikt nie prosił o ekran logowania -> prosto do HMI */
   if (z && z.user && z.pass && q.get('login') !== '1') { location.replace('hmi.html?mqtt=1'); return; }
   el('host').value = (z && z.host) || q.get('host') || HOST;
@@ -186,7 +186,7 @@
                 const host2 = el('host2').value.trim(), user2 = el('user2').value.trim(), pass2 = el('pass2').value;
                 const host3 = el('host3').value.trim(), user3 = el('user3').value.trim(), pass3 = el('pass3').value;
                 const dane = { host, user, pass, nazwa, serwis, host2, user2, pass2, host3, user3, pass3 };
-                try { if (el('zap').checked) localStorage.setItem('odbior_mqtt', JSON.stringify(dane));
+                try { if (el('zap').checked) localStorage.setItem('test2:odbior_mqtt', JSON.stringify(dane));
                       else sessionStorage.setItem('odbior_mqtt_tmp', JSON.stringify(dane)); } catch(e){}
                 setTimeout(() => location.href = 'hmi.html?mqtt=1', 400); } };
     setTimeout(() => koniec(false, 'Żaden serwer nie odpowiada w 9 s — sprawdź zasięg i nazwę serwera.'), 9000);
